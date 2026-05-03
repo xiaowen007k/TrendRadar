@@ -395,8 +395,8 @@ presets:
 #     其余时间走默认配置（静默采集）
 
 custom:
-  name: "自定义"
-  description: "完全自由定义时间段、日计划和周映射。"
+  name: "每天10点22点推送"
+  description: "每天上午10点和晚上10点推送+分析，其他时间静默采集"
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # 默认配置
@@ -459,16 +459,31 @@ custom:
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   periods:
 
-    deep_quiet:
-      name: "深夜静默"
-      start: "23:00"
-      end: "06:00"                 # 23:00 → 次日 06:00（跨日时间段）
-      # frequency_file: "xxx.txt"               # 关键词文件（可选，位于 config/custom/keyword/）
-      # interests_file: "xxx.txt"                # AI 兴趣文件（可选，位于 config/custom/ai/）
-      # filter_method: "keyword"                # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
-      collect: true                # 夜间继续采集数据
-      analyze: true                # 夜间可以跑 AI 分析（反正不推送）
-      push: false                  # 深夜不推送，避免打扰
+    morning_push:
+      name: "上午推送"
+      start: "10:00"
+      end: "10:30"           # 跨度 30 分钟，留足触发裕量
+      # frequency_file: "xxx.txt"      # 关键词文件（可选，位于 config/custom/keyword/）
+      # interests_file: "xxx.txt"      # AI 兴趣文件（可选，位于 config/custom/ai/）
+      # filter_method: "keyword"       # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
+      analyze: true          # 开启 AI 分析
+      ai_mode: "daily"       # AI 分析全天内容
+      push: true             # 发送推送
+      report_mode: "daily"   # 推送当日全部新闻汇总
+      # once 继承 default（analyze: true, push: true）→ 窗口内只分析/推送一次
+
+    night_push:
+      name: "晚上推送"
+      start: "22:00"
+      end: "22:30"           # 跨度 30 分钟
+      # frequency_file: "xxx.txt"      # 关键词文件（可选，位于 config/custom/keyword/）
+      # interests_file: "xxx.txt"      # AI 兴趣文件（可选，位于 config/custom/ai/）
+      # filter_method: "keyword"       # 筛选策略（可选: keyword | ai，不填用全局 filter.method）
+      analyze: true          # 开启 AI 分析
+      ai_mode: "daily"       # AI 分析全天内容
+      push: true             # 发送推送
+      report_mode: "daily"   # 推送当日全部新闻汇总
+      # once 继承 default（analyze: true, push: true）→ 窗口内只分析/推送一次
 
     weekday_morning:
       name: "工作日早间"
@@ -513,11 +528,14 @@ custom:
   # 你可以定义多个日计划（如 workday 和 weekend），
   # 然后在第 3 步的 week_map 中分配给不同的星期。
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  #day_plans:
+  #  workday:                       # 工作日计划
+  #    periods: ["deep_quiet", "weekday_morning", "evening_summary"]
+  #  weekend:                       # 周末计划（用 weekend_morning 替换 weekday_morning）
+  #    periods: ["deep_quiet", "weekend_morning", "evening_summary"]
   day_plans:
-    workday:                       # 工作日计划
-      periods: ["deep_quiet", "weekday_morning", "evening_summary"]
-    weekend:                       # 周末计划（用 weekend_morning 替换 weekday_morning）
-      periods: ["deep_quiet", "weekend_morning", "evening_summary"]
+    all_day:                 # 每天的计划
+      periods: ["morning_push", "night_push"]    
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -526,13 +544,13 @@ custom:
   # 1=周一  2=周二  3=周三  4=周四  5=周五  6=周六  7=周日
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   week_map:
-    1: "workday"                   # 周一 → 工作日计划
-    2: "workday"                   # 周二
-    3: "workday"                   # 周三
-    4: "workday"                   # 周四
-    5: "workday"                   # 周五
-    6: "weekend"                   # 周六 → 周末计划
-    7: "weekend"                   # 周日
+    1: "all_day"             # 周一
+    2: "all_day"             # 周二
+    3: "all_day"             # 周三
+    4: "all_day"             # 周四
+    5: "all_day"             # 周五
+    6: "all_day"             # 周六
+    7: "all_day"             # 周日
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
